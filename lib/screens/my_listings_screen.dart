@@ -238,7 +238,6 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
               ],
             ),
             if (!isPending) ...[
-
               const SizedBox(height: 16),
               StreamBuilder<List<Book>>(
                 stream: _firestoreService.getBooks(),
