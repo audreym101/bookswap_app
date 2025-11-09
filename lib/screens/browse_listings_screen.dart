@@ -19,14 +19,17 @@ class _BrowseListingsScreenState extends State<BrowseListingsScreen> {
   final _authService = AuthService();
 
   Future<void> _initiateSwap(Book targetBook) async {
-    final selectedBook = await Navigator.push<Book>(
+    final result = await Navigator.push<Map<String, dynamic>>(
       context,
       MaterialPageRoute(
         builder: (context) => BookSelectionScreen(targetBook: targetBook),
       ),
     );
     
-    if (selectedBook == null) return;
+    if (result == null) return;
+    
+    final selectedBook = result['book'] as Book;
+    final wantedDescription = result['wantedDescription'] as String;
     
     final user = _authService.currentUser!;
     final offer = SwapOffer(
@@ -35,8 +38,9 @@ class _BrowseListingsScreenState extends State<BrowseListingsScreen> {
       bookTitle: targetBook.title,
       offeredBookId: selectedBook.id,
       offeredBookTitle: selectedBook.title,
+      wantedBookDescription: wantedDescription,
       requesterId: user.uid,
-      requesterName: user.email ?? 'Unknown',
+      requesterName: user.email?.split('@')[0] ?? 'Unknown',
       ownerId: targetBook.ownerId,
       ownerName: targetBook.ownerName,
       status: 'pending',

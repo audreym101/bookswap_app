@@ -102,6 +102,27 @@ class _ReceivedOffersScreenState extends State<ReceivedOffersScreen> {
                           ],
                         ),
                       ),
+                      if (offer.wantedBookDescription.isNotEmpty) ...[
+                        const SizedBox(height: 8),
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[100],
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'They want in return:',
+                                style: TextStyle(fontWeight: FontWeight.w500),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(offer.wantedBookDescription),
+                            ],
+                          ),
+                        ),
+                      ],
                       const SizedBox(height: 8),
                       Text('From: ${offer.requesterName}'),
                       const SizedBox(height: 8),

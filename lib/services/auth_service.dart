@@ -55,6 +55,16 @@ class AuthService {
 
   Future<void> reloadUser() async {
     await _auth.currentUser?.reload();
+    final user = _auth.currentUser;
+    if (user != null && user.emailVerified) {
+      await _updateUserEmailVerification(user.uid, true);
+    }
+  }
+
+  Future<void> _updateUserEmailVerification(String uid, bool verified) async {
+    await _firestore.collection('users').doc(uid).update({
+      'emailVerified': verified,
+    });
   }
 
   bool get isEmailVerified => _auth.currentUser?.emailVerified ?? false;

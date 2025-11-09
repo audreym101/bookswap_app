@@ -13,6 +13,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   final _authService = AuthService();
   Timer? _timer;
   bool _isResending = false;
+  bool _isChecking = false;
 
   @override
   void initState() {
@@ -111,13 +112,42 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
             ),
             const SizedBox(height: 16),
             TextButton(
-              onPressed: () async {
-                await _authService.reloadUser();
-                if (_authService.isEmailVerified && mounted) {
-                  Navigator.of(context).pushReplacementNamed('/home');
+              onPressed: _isChecking ? null : () async {
+                final navigator = Navigator.of(context);
+                final scaffoldMessenger = ScaffoldMessenger.of(context);
+                setState(() => _isChecking = true);
+                try {
+                  await _authService.reloadUser();
+                  if (_authService.isEmailVerified) {
+                    if (mounted) {
+                      navigator.pushReplacementNamed('/home');
+                    }
+                  } else {
+                    if (mounted) {
+                      scaffoldMessenger.showSnackBar(
+                        const SnackBar(
+                          content: Text('Email not verified yet. Please check your email and click the verification link.'),
+                          backgroundColor: Colors.orange,
+                        ),
+                      );
+                    }
+                  }
+                } catch (e) {
+                  if (mounted) {
+                    scaffoldMessenger.showSnackBar(
+                      SnackBar(content: Text('Error checking verification: $e')),
+                    );
+                  }
                 }
+                if (mounted) setState(() => _isChecking = false);
               },
-              child: const Text('I\'ve verified my email'),
+              child: _isChecking 
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Text('I\'ve verified my email'),
             ),
           ],
         ),

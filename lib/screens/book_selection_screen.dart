@@ -4,10 +4,23 @@ import '../services/firestore_service.dart';
 import '../services/auth_service.dart';
 import '../widgets/book_card.dart';
 
-class BookSelectionScreen extends StatelessWidget {
+class BookSelectionScreen extends StatefulWidget {
   final Book targetBook;
   
   const BookSelectionScreen({super.key, required this.targetBook});
+
+  @override
+  State<BookSelectionScreen> createState() => _BookSelectionScreenState();
+}
+
+class _BookSelectionScreenState extends State<BookSelectionScreen> {
+  final _wantedBookController = TextEditingController();
+  
+  @override
+  void dispose() {
+    _wantedBookController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,8 +41,18 @@ class BookSelectionScreen extends StatelessWidget {
               children: [
                 const Text('You want:', style: TextStyle(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
-                Text('${targetBook.title} by ${targetBook.author}'),
-                const SizedBox(height: 8),
+                Text('${widget.targetBook.title} by ${widget.targetBook.author}'),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: _wantedBookController,
+                  decoration: const InputDecoration(
+                    labelText: 'What type of book do you want in return?',
+                    hintText: 'e.g., Mystery novels, Science fiction, Romance...',
+                    border: OutlineInputBorder(),
+                  ),
+                  maxLines: 2,
+                ),
+                const SizedBox(height: 16),
                 const Text('Select one of your books to offer in exchange:'),
               ],
             ),
@@ -55,7 +78,13 @@ class BookSelectionScreen extends StatelessWidget {
                     final book = books[index];
                     return BookCard(
                       book: book,
-                      onTap: () => Navigator.pop(context, book),
+                      onTap: () {
+                        final wantedDescription = _wantedBookController.text.trim();
+                        Navigator.pop(context, {
+                          'book': book,
+                          'wantedDescription': wantedDescription,
+                        });
+                      },
                       trailing: const Icon(Icons.arrow_forward_ios),
                     );
                   },
