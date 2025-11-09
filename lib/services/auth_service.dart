@@ -22,6 +22,7 @@ class AuthService {
     try {
       final credential = await _auth.createUserWithEmailAndPassword(email: email, password: password);
       if (credential.user != null) {
+        await credential.user!.sendEmailVerification();
         await _createUserProfile(credential.user!);
       }
       return credential;
@@ -35,7 +36,7 @@ class AuthService {
       uid: user.uid,
       email: user.email ?? '',
       displayName: user.email?.split('@')[0] ?? 'User',
-      emailVerified: true,
+      emailVerified: user.emailVerified,
       createdAt: DateTime.now(),
     );
     await _firestore.collection('users').doc(user.uid).set(profile.toMap());
@@ -44,4 +45,17 @@ class AuthService {
   Future<void> signOut() async {
     await _auth.signOut();
   }
+
+  Future<void> sendEmailVerification() async {
+    final user = _auth.currentUser;
+    if (user != null && !user.emailVerified) {
+      await user.sendEmailVerification();
+    }
+  }
+
+  Future<void> reloadUser() async {
+    await _auth.currentUser?.reload();
+  }
+
+  bool get isEmailVerified => _auth.currentUser?.emailVerified ?? false;
 }

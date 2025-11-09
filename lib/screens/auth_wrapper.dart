@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../services/auth_service.dart';
 import 'login_screen.dart';
 import 'main_navigation.dart';
+import 'email_verification_screen.dart';
 
 class AuthWrapper extends StatelessWidget {
   const AuthWrapper({super.key});
@@ -19,7 +20,12 @@ class AuthWrapper extends StatelessWidget {
         }
         
         if (snapshot.hasData) {
-          return const MainNavigation();
+          final user = snapshot.data!;
+          if (user.emailVerified) {
+            return const MainNavigation();
+          } else {
+            return const EmailVerificationScreen();
+          }
         } else {
           return const LoginScreen();
         }

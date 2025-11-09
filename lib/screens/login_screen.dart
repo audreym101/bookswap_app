@@ -47,6 +47,14 @@ class _LoginScreenState extends State<LoginScreen> {
         await _authService.signInWithEmailAndPassword(email, password);
       } else {
         await _authService.createUserWithEmailAndPassword(email, password);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Account created! Please check your email to verify your account.'),
+              duration: Duration(seconds: 5),
+            ),
+          );
+        }
       }
     } catch (e) {
       if (mounted) {
