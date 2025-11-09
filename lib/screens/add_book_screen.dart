@@ -26,7 +26,33 @@ class _AddBookScreenState extends State<AddBookScreen> {
 
   Future<void> _pickImage() async {
     final picker = ImagePicker();
-    final picked = await picker.pickImage(source: ImageSource.gallery);
+    
+    // Show options for camera or gallery
+    final source = await showDialog<ImageSource>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Select Image Source'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: const Text('Camera'),
+              onTap: () => Navigator.pop(context, ImageSource.camera),
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: const Text('Gallery'),
+              onTap: () => Navigator.pop(context, ImageSource.gallery),
+            ),
+          ],
+        ),
+      ),
+    );
+    
+    if (source == null) return;
+    
+    final picked = await picker.pickImage(source: source);
     if (picked == null) return;
 
 
@@ -55,10 +81,9 @@ class _AddBookScreenState extends State<AddBookScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Image upload failed')),
+          SnackBar(content: Text('Image upload failed: ${e.toString()}')),
         );
       }
-
     }
   }
 
