@@ -22,7 +22,7 @@ class BookCard extends StatelessWidget {
         leading: book.imageBase64.isNotEmpty
             ? ClipRRect(
                 borderRadius: BorderRadius.circular(8),
-                child: book.imageBase64.startsWith('http')
+                child: book.isImageUrl
                     ? Image.network(
                         book.imageBase64,
                         width: 60,

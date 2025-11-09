@@ -290,10 +290,17 @@ class _AddBookScreenState extends State<AddBookScreen> {
                     : _imageBase64.isNotEmpty
                     ? ClipRRect(
                         borderRadius: BorderRadius.circular(8),
-                        child: Image.memory(
-                          base64Decode(_imageBase64),
-                          fit: BoxFit.cover,
-                        ),
+                        child: _imageBase64.startsWith('http')
+                            ? Image.network(
+                                _imageBase64,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) => 
+                                  const Icon(Icons.error, size: 40),
+                              )
+                            : Image.memory(
+                                base64Decode(_imageBase64),
+                                fit: BoxFit.cover,
+                              ),
                       )
                     : const Column(
                         mainAxisAlignment: MainAxisAlignment.center,

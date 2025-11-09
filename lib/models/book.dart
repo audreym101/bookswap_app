@@ -51,4 +51,6 @@ class Book {
       'condition': condition,
     };
   }
+
+  bool get isImageUrl => imageBase64.startsWith('http');
 }
