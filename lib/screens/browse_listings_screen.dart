@@ -5,6 +5,7 @@ import '../services/auth_service.dart';
 import '../models/book.dart';
 import '../models/swap_offer.dart';
 import 'add_book_screen.dart';
+import 'book_selection_screen.dart';
 
 class BrowseListingsScreen extends StatefulWidget {
   const BrowseListingsScreen({super.key});
@@ -17,16 +18,27 @@ class _BrowseListingsScreenState extends State<BrowseListingsScreen> {
   final _firestoreService = FirestoreService();
   final _authService = AuthService();
 
-  Future<void> _initiateSwap(Book book) async {
+  Future<void> _initiateSwap(Book targetBook) async {
+    final selectedBook = await Navigator.push<Book>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => BookSelectionScreen(targetBook: targetBook),
+      ),
+    );
+    
+    if (selectedBook == null) return;
+    
     final user = _authService.currentUser!;
     final offer = SwapOffer(
       id: '',
-      bookId: book.id,
-      bookTitle: book.title,
+      bookId: targetBook.id,
+      bookTitle: targetBook.title,
+      offeredBookId: selectedBook.id,
+      offeredBookTitle: selectedBook.title,
       requesterId: user.uid,
       requesterName: user.email ?? 'Unknown',
-      ownerId: book.ownerId,
-      ownerName: book.ownerName,
+      ownerId: targetBook.ownerId,
+      ownerName: targetBook.ownerName,
       status: 'pending',
       createdAt: DateTime.now(),
     );
@@ -34,7 +46,7 @@ class _BrowseListingsScreenState extends State<BrowseListingsScreen> {
     await _firestoreService.createSwapOffer(offer);
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Swap request sent!')),
+        SnackBar(content: Text('Swap offer sent! You offered "${selectedBook.title}" for "${targetBook.title}"')),
       );
     }
   }

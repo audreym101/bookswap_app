@@ -1,7 +1,9 @@
 class SwapOffer {
   final String id;
-  final String bookId;
+  final String bookId; // Book being requested
   final String bookTitle;
+  final String offeredBookId; // Book being offered in exchange
+  final String offeredBookTitle;
   final String requesterId;
   final String requesterName;
   final String ownerId;
@@ -13,6 +15,8 @@ class SwapOffer {
     required this.id,
     required this.bookId,
     required this.bookTitle,
+    required this.offeredBookId,
+    required this.offeredBookTitle,
     required this.requesterId,
     required this.requesterName,
     required this.ownerId,
@@ -26,6 +30,8 @@ class SwapOffer {
       id: id,
       bookId: map['bookId'] ?? '',
       bookTitle: map['bookTitle'] ?? '',
+      offeredBookId: map['offeredBookId'] ?? '',
+      offeredBookTitle: map['offeredBookTitle'] ?? '',
       requesterId: map['requesterId'] ?? '',
       requesterName: map['requesterName'] ?? '',
       ownerId: map['ownerId'] ?? '',
@@ -39,6 +45,8 @@ class SwapOffer {
     return {
       'bookId': bookId,
       'bookTitle': bookTitle,
+      'offeredBookId': offeredBookId,
+      'offeredBookTitle': offeredBookTitle,
       'requesterId': requesterId,
       'requesterName': requesterName,
       'ownerId': ownerId,

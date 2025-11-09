@@ -70,7 +70,7 @@ class _MyOffersScreenState extends State<MyOffersScreen> {
                         children: [
                           Expanded(
                             child: Text(
-                              offer.bookTitle,
+                              'Book Exchange',
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 16,
@@ -98,9 +98,46 @@ class _MyOffersScreenState extends State<MyOffersScreen> {
                           ),
                         ],
                       ),
+                      const SizedBox(height: 12),
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[800],
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                const Icon(Icons.book, color: Colors.blue, size: 16),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    'You want: ${offer.bookTitle}',
+                                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            Row(
+                              children: [
+                                const Icon(Icons.swap_horiz, color: Colors.green, size: 16),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    'You offered: ${offer.offeredBookTitle}',
+                                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
                       const SizedBox(height: 8),
                       Text(
-                        'Owner: ${offer.ownerName}',
+                        'To: ${offer.ownerName}',
                         style: const TextStyle(
                           color: Colors.white70,
                           fontSize: 14,
