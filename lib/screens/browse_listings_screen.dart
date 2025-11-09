@@ -107,12 +107,19 @@ class _BrowseListingsScreenState extends State<BrowseListingsScreen> {
                             child: book.imageBase64.isNotEmpty
                                 ? ClipRRect(
                                     borderRadius: BorderRadius.circular(8),
-                                    child: Image.memory(
-                                      base64Decode(book.imageBase64),
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (context, error, stackTrace) =>
-                                          const Icon(Icons.book, color: Colors.white54),
-                                    ),
+                                    child: book.imageBase64.startsWith('http')
+                                        ? Image.network(
+                                            book.imageBase64,
+                                            fit: BoxFit.cover,
+                                            errorBuilder: (context, error, stackTrace) =>
+                                                const Icon(Icons.book, color: Colors.white54),
+                                          )
+                                        : Image.memory(
+                                            base64Decode(book.imageBase64),
+                                            fit: BoxFit.cover,
+                                            errorBuilder: (context, error, stackTrace) =>
+                                                const Icon(Icons.book, color: Colors.white54),
+                                          ),
                                   )
                                 : const Icon(Icons.book, color: Colors.white54),
                           ),
