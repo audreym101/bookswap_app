@@ -269,7 +269,6 @@ class _AddBookScreenState extends State<AddBookScreen> {
                             );
                           },
                           errorBuilder: (context, error, stackTrace) {
-                            print('Image load error: $error');
                             return Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
