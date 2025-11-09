@@ -21,14 +21,16 @@ class _AddBookScreenState extends State<AddBookScreen> {
   final _descriptionController = TextEditingController();
   final _authService = AuthService();
   final _firestoreService = FirestoreService();
+  final _imageUrlController = TextEditingController();
   bool _isLoading = false;
   String _imageBase64 = '';
+  String _imageUrl = '';
 
   Future<void> _pickImage() async {
     final picker = ImagePicker();
     
-    // Show options for camera or gallery
-    final source = await showDialog<ImageSource>(
+    // Show options for camera, gallery, or URL
+    final choice = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Select Image Source'),
@@ -38,24 +40,33 @@ class _AddBookScreenState extends State<AddBookScreen> {
             ListTile(
               leading: const Icon(Icons.camera_alt),
               title: const Text('Camera'),
-              onTap: () => Navigator.pop(context, ImageSource.camera),
+              onTap: () => Navigator.pop(context, 'camera'),
             ),
             ListTile(
               leading: const Icon(Icons.photo_library),
               title: const Text('Gallery'),
-              onTap: () => Navigator.pop(context, ImageSource.gallery),
+              onTap: () => Navigator.pop(context, 'gallery'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.link),
+              title: const Text('Image URL'),
+              onTap: () => Navigator.pop(context, 'url'),
             ),
           ],
         ),
       ),
     );
     
-    if (source == null) return;
+    if (choice == null) return;
     
+    if (choice == 'url') {
+      _showUrlDialog();
+      return;
+    }
+    
+    final source = choice == 'camera' ? ImageSource.camera : ImageSource.gallery;
     final picked = await picker.pickImage(source: source);
     if (picked == null) return;
-
-
 
     try {
       String base64Image;
@@ -77,6 +88,7 @@ class _AddBookScreenState extends State<AddBookScreen> {
 
       setState(() {
         _imageBase64 = base64Image;
+        _imageUrl = '';
       });
     } catch (e) {
       if (mounted) {
@@ -85,6 +97,38 @@ class _AddBookScreenState extends State<AddBookScreen> {
         );
       }
     }
+  }
+
+  void _showUrlDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Enter Image URL'),
+        content: TextField(
+          controller: _imageUrlController,
+          decoration: const InputDecoration(
+            hintText: 'https://example.com/image.jpg',
+            border: OutlineInputBorder(),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              setState(() {
+                _imageUrl = _imageUrlController.text.trim();
+                _imageBase64 = '';
+              });
+              Navigator.pop(context);
+            },
+            child: const Text('Use URL'),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _addBook() async {
@@ -106,7 +150,7 @@ class _AddBookScreenState extends State<AddBookScreen> {
         title: _titleController.text.trim(),
         author: _authorController.text.trim(),
         description: _descriptionController.text.trim(),
-        imageBase64: _imageBase64,
+        imageBase64: _imageUrl.isNotEmpty ? _imageUrl : _imageBase64,
         ownerId: user.uid,
         ownerName: user.email?.split('@')[0] ?? 'Unknown',
         isAvailable: true,
@@ -174,7 +218,17 @@ class _AddBookScreenState extends State<AddBookScreen> {
                   border: Border.all(color: Colors.grey),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: _imageBase64.isNotEmpty
+                child: _imageUrl.isNotEmpty
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.network(
+                          _imageUrl,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) => 
+                            const Icon(Icons.error, size: 40),
+                        ),
+                      )
+                    : _imageBase64.isNotEmpty
                     ? ClipRRect(
                         borderRadius: BorderRadius.circular(8),
                         child: Image.memory(

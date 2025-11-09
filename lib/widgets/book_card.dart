@@ -22,12 +22,26 @@ class BookCard extends StatelessWidget {
         leading: book.imageBase64.isNotEmpty
             ? ClipRRect(
                 borderRadius: BorderRadius.circular(8),
-                child: Image.memory(
-                  base64Decode(book.imageBase64),
-                  width: 60,
-                  height: 80,
-                  fit: BoxFit.cover,
-                ),
+                child: book.imageBase64.startsWith('http')
+                    ? Image.network(
+                        book.imageBase64,
+                        width: 60,
+                        height: 80,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => 
+                          Container(
+                            width: 60,
+                            height: 80,
+                            color: Colors.grey[300],
+                            child: const Icon(Icons.error),
+                          ),
+                      )
+                    : Image.memory(
+                        base64Decode(book.imageBase64),
+                        width: 60,
+                        height: 80,
+                        fit: BoxFit.cover,
+                      ),
               )
             : Container(
                 width: 60,

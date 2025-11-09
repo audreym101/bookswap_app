@@ -3,7 +3,7 @@ class Book {
   final String title;
   final String author;
   final String description;
-  final String imageBase64;
+  final String imageBase64; // Can store base64 data or URL
   final String ownerId;
   final String ownerName;
   final bool isAvailable;
@@ -29,7 +29,7 @@ class Book {
       title: map['title'] ?? '',
       author: map['author'] ?? '',
       description: map['description'] ?? '',
-      imageBase64: map['imageBase64'] ?? '',
+      imageBase64: map['imageBase64'] ?? '', // Handles both base64 and URLs
       ownerId: map['ownerId'] ?? '',
       ownerName: map['ownerName'] ?? '',
       isAvailable: map['isAvailable'] ?? true,
