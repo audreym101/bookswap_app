@@ -101,11 +101,11 @@ class _AddBookScreenState extends State<AddBookScreen> {
 
   void _showUrlDialog() {
     final sampleUrls = [
-      'https://covers.openlibrary.org/b/id/8225261-L.jpg',
-      'https://covers.openlibrary.org/b/id/240726-M.jpg',
-      'https://covers.openlibrary.org/b/id/6979861-M.jpg',
-      'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400',
-      'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400',
+      'https://picsum.photos/400/600?random=1',
+      'https://picsum.photos/400/600?random=2',
+      'https://picsum.photos/400/600?random=3',
+      'https://via.placeholder.com/400x600/FF6B6B/FFFFFF?text=Book+Cover',
+      'https://via.placeholder.com/400x600/4ECDC4/FFFFFF?text=Sample+Book',
     ];
 
     showDialog(
@@ -262,6 +262,7 @@ class _AddBookScreenState extends State<AddBookScreen> {
                         child: Image.network(
                           _imageUrl,
                           fit: BoxFit.cover,
+                          headers: const {'User-Agent': 'BookSwap/1.0'},
                           loadingBuilder: (context, child, loadingProgress) {
                             if (loadingProgress == null) return child;
                             return const Center(
@@ -269,13 +270,19 @@ class _AddBookScreenState extends State<AddBookScreen> {
                             );
                           },
                           errorBuilder: (context, error, stackTrace) {
-                            return Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(Icons.error, size: 40),
-                                Text('Failed to load image', 
-                                     style: TextStyle(fontSize: 12)),
-                              ],
+                            return Container(
+                              color: Colors.grey[200],
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Icon(Icons.broken_image, size: 40, color: Colors.grey),
+                                  const SizedBox(height: 8),
+                                  Text('Image failed to load', 
+                                       style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                                  Text('Try a different URL', 
+                                       style: TextStyle(fontSize: 10, color: Colors.grey[500])),
+                                ],
+                              ),
                             );
                           },
                         ),
