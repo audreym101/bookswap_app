@@ -100,15 +100,53 @@ class _AddBookScreenState extends State<AddBookScreen> {
   }
 
   void _showUrlDialog() {
+    final sampleUrls = [
+      'https://covers.openlibrary.org/b/id/8225261-L.jpg',
+      'https://covers.openlibrary.org/b/id/240726-M.jpg',
+      'https://covers.openlibrary.org/b/id/6979861-M.jpg',
+      'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400',
+      'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400',
+    ];
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Enter Image URL'),
-        content: TextField(
-          controller: _imageUrlController,
-          decoration: const InputDecoration(
-            hintText: 'https://example.com/image.jpg',
-            border: OutlineInputBorder(),
+        title: const Text('Select Image'),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: _imageUrlController,
+                decoration: const InputDecoration(
+                  labelText: 'Custom URL',
+                  hintText: 'https://example.com/image.jpg',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Text('Or choose a sample:'),
+              const SizedBox(height: 8),
+              ...sampleUrls.map((url) => ListTile(
+                leading: Image.network(
+                  url,
+                  width: 40,
+                  height: 40,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => 
+                    const Icon(Icons.image),
+                ),
+                title: Text('Sample ${sampleUrls.indexOf(url) + 1}'),
+                onTap: () {
+                  setState(() {
+                    _imageUrl = url;
+                    _imageBase64 = '';
+                  });
+                  Navigator.pop(context);
+                },
+              )),
+            ],
           ),
         ),
         actions: [
@@ -124,7 +162,7 @@ class _AddBookScreenState extends State<AddBookScreen> {
               });
               Navigator.pop(context);
             },
-            child: const Text('Use URL'),
+            child: const Text('Use Custom URL'),
           ),
         ],
       ),
@@ -224,8 +262,23 @@ class _AddBookScreenState extends State<AddBookScreen> {
                         child: Image.network(
                           _imageUrl,
                           fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) => 
-                            const Icon(Icons.error, size: 40),
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          },
+                          errorBuilder: (context, error, stackTrace) {
+                            print('Image load error: $error');
+                            return Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(Icons.error, size: 40),
+                                Text('Failed to load image', 
+                                     style: TextStyle(fontSize: 12)),
+                              ],
+                            );
+                          },
                         ),
                       )
                     : _imageBase64.isNotEmpty
