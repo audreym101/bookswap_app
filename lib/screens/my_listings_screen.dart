@@ -140,9 +140,23 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
                           ],
                         ),
                       ),
-                      IconButton(
-                        onPressed: () => _deleteBook(book.id),
-                        icon: const Icon(Icons.delete, color: Colors.red),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            onPressed: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => AddBookScreen(book: book),
+                              ),
+                            ),
+                            icon: const Icon(Icons.edit, color: Colors.blue),
+                          ),
+                          IconButton(
+                            onPressed: () => _deleteBook(book.id),
+                            icon: const Icon(Icons.delete, color: Colors.red),
+                          ),
+                        ],
                       ),
                     ],
                   ),

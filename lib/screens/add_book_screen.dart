@@ -9,7 +9,8 @@ import '../services/firestore_service.dart';
 import '../models/book.dart';
 
 class AddBookScreen extends StatefulWidget {
-  const AddBookScreen({super.key});
+  final Book? book;
+  const AddBookScreen({super.key, this.book});
 
   @override
   State<AddBookScreen> createState() => _AddBookScreenState();
@@ -169,7 +170,7 @@ class _AddBookScreenState extends State<AddBookScreen> {
     );
   }
 
-  Future<void> _addBook() async {
+  Future<void> _saveBook() async {
     if (_titleController.text.trim().isEmpty ||
         _authorController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -184,24 +185,28 @@ class _AddBookScreenState extends State<AddBookScreen> {
       final user = _authService.currentUser!;
       
       final book = Book(
-        id: '',
+        id: widget.book?.id ?? '',
         title: _titleController.text.trim(),
         author: _authorController.text.trim(),
         description: _descriptionController.text.trim(),
         imageBase64: _imageUrl.isNotEmpty ? _imageUrl : _imageBase64,
         ownerId: user.uid,
         ownerName: user.email?.split('@')[0] ?? 'Unknown',
-        isAvailable: true,
-        createdAt: DateTime.now(),
+        isAvailable: widget.book?.isAvailable ?? true,
+        createdAt: widget.book?.createdAt ?? DateTime.now(),
         condition: _selectedCondition,
       );
 
-      await _firestoreService.addBook(book);
+      if (widget.book != null) {
+        await _firestoreService.updateBook(book);
+      } else {
+        await _firestoreService.addBook(book);
+      }
       if (mounted) Navigator.pop(context);
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error adding book: $e')),
+          SnackBar(content: Text('Error saving book: $e')),
         );
       }
     }
@@ -213,10 +218,28 @@ class _AddBookScreenState extends State<AddBookScreen> {
   final List<String> _conditions = ['New', 'Like New', 'Good', 'Used'];
 
   @override
+  void initState() {
+    super.initState();
+    if (widget.book != null) {
+      _titleController.text = widget.book!.title;
+      _authorController.text = widget.book!.author;
+      _descriptionController.text = widget.book!.description;
+      _selectedCondition = widget.book!.condition;
+      if (widget.book!.imageBase64.isNotEmpty) {
+        if (widget.book!.imageBase64.startsWith('http')) {
+          _imageUrl = widget.book!.imageBase64;
+        } else {
+          _imageBase64 = widget.book!.imageBase64;
+        }
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Post a Book'),
+        title: Text(widget.book != null ? 'Edit Book' : 'Post a Book'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -347,8 +370,8 @@ class _AddBookScreenState extends State<AddBookScreen> {
                 : SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: _addBook,
-                      child: const Text('Post Book'),
+                      onPressed: _saveBook,
+                      child: Text(widget.book != null ? 'Update Book' : 'Post Book'),
                     ),
                   ),
           ],
